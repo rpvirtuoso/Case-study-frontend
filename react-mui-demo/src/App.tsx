@@ -10,7 +10,7 @@ function App() {
     <div >
       {/* <MuiTypography/> */}
       <Routes>
-          <Route path="/" element={<Home/>}/>
+          <Route path="/" element={<Muinavbar/>}/>
           <Route path='/login' element={<Login/>}/>
           <Route path='/signup' element={<Signup/>}/>
           <Route path='/signup1' element={<Signup1/>}/>

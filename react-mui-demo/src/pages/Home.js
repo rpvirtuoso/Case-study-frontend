@@ -17,6 +17,7 @@ import { useState } from 'react';
 import ProductList from '../components/ProductList';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import {Button} from '@mui/material'; 
+import { convertCompilerOptionsFromJson } from 'typescript';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -65,25 +66,54 @@ export default function Home() {
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownAnchor, setDropdownAnchor] = useState(null);
+  const isDropdownopen= Boolean(dropdownAnchor);
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
-
+  const handlecCategoryOpen=(event)=>{
+    console.log('handlecatergoryopen called')
+    setDropdownAnchor(event.currentTarget);
+  }
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
   };
-
+  const handleCategoryClose=(event)=>{
+    setDropdownAnchor(null);
+  }
   const handleMenuClose = () => {
     setAnchorEl(null);
     handleMobileMenuClose();
   };
-
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
+  const categoryId='category-dropdown';
+  const renderDropdown = (
+    <Menu
+      dropdownAnchor={dropdownAnchor}
+      anchorOrigin={{
+        vertical: 'bottom',
+        // horizontal: 'right',
+      }}
+      id={categoryId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'bottom',
+        // horizontal: 'right',
+      }}
+      open={isDropdownopen}
+      onClose={handleCategoryClose}
+    >
+      <MenuItem onClick={handleCategoryClose}>Cat1</MenuItem>
+      <MenuItem onClick={handleCategoryClose}>Cat2</MenuItem>
+    </Menu>
+  );
+
+
+ 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -123,29 +153,14 @@ export default function Home() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
+      
       <MenuItem>
-        <Button onClick={() => setDropdownOpen(!dropdownOpen)}>
-          <Typography>
-              Categories
-          </Typography>
-        </Button>
-        {dropdownOpen && (
-          <ClickAwayListener onClickAway={() => setDropdownOpen(false)}>
-          <Menu>
-            <MenuItem>Option 1</MenuItem>
-            <MenuItem>Option 2</MenuItem>
-            <MenuItem>Option 3</MenuItem>
-          </Menu>
-        </ClickAwayListener>
-      )}
-      </MenuItem>
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+        <IconButton size="large" color="inherit">
           <Badge badgeContent={0} color="error">
             <ShoppingCartIcon />
           </Badge>
         </IconButton>
-        <p>Messages</p>
+        <p>Cart</p>
       </MenuItem>
       {/* <MenuItem>
         <IconButton
@@ -204,6 +219,16 @@ export default function Home() {
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }} />
           </Search>
+          <Button
+              size="large"
+              edge="end"
+              aria-label="Categories"
+              aria-controls={categoryId}
+              aria-haspopup="true"
+              onClick={handlecCategoryOpen}
+              color="inherit"
+            >Categories
+            </Button>
           <Box sx={{ flexGrow: 1 }} />
 
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
@@ -247,11 +272,11 @@ export default function Home() {
           </Box>
         </Toolbar>
       </AppBar>
-
+      {renderDropdown}
       {renderMobileMenu}
       {renderMenu}
     </Box>
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 0 }}>
         <ProductList/>
     </Box>
     </Box>
