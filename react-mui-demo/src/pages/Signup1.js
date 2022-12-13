@@ -62,8 +62,7 @@ function Signup1() {
         localStorage.setItem(email, token)
         localStorage.setItem('ID',id)
         console.log("Just  before redirect")
-        const token2= localStorage.getItem(email)
-
+        const token2=localStorage.getItem(email)
         console.log(token2)
         navigate("/login");
         

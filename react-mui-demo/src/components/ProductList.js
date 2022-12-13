@@ -11,7 +11,8 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
   },
   productImage: {
-    width: '50%',
+    width: 128,
+    height:128,
     
   },
   productName: {

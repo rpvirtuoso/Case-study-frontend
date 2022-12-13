@@ -16,35 +16,66 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState } from 'react';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import axios, * as others from 'axios';
-
-
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme();
 
 export default function SignIn() {
-  const handleSubmit = (event) => {
+  const navigate=useNavigate()
+  const [state, setState] = useState({email:null,token:null,user_id:null});
+  const email=state.email
+  const token=state.token
+  const user_id=state.user_id
+  // const [isAuthenticated,]
+  const handleSubmit = async(event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const email= data.get('email');
-    console.log(typeof email)
     const password= data.get('password');
-
-    const token=localStorage.getItem(email)
-    console.log(token)
-    const config = {
-      headers: { Authorization: `Token ${token}` }
-  };
+  //   const config = {
+  //     headers: { Authorization: `Token ${token}` }
+  // };
   
   const bodyParameters = {
      email: email,
      password:password
   };
-  
-  axios.post( 
+//   axios.post( 
+//     'http://127.0.0.1:8000/api/account/login',
+//     bodyParameters,
+//     config
+//   ).then(() => {
+//     navigate("/");
+// }).catch(console.log);
+
+  // Make the POST request
+  const response = await axios.post(
     'http://127.0.0.1:8000/api/account/login',
     bodyParameters,
-    config
-  ).then(console.log).catch(console.log);
+    // config
+  );
+
+  // Save the response data in state
+ 
+
+  // localStorage.setItem('email')
+  console.log(response);
+  console.log(response.data);
+  setState(prevState=>{
+    return{      
+      email:response.data.email,
+      token:response.data.token,
+      user_id:response.data.user_id
+    }
+    }
+  )
+  console.log(state)
+  
+  localStorage.setItem("email",email);
+  localStorage.setItem("token",token);
+  localStorage.setItem("user_id",user_id);
+  navigate('/');
+
   };
   
 
