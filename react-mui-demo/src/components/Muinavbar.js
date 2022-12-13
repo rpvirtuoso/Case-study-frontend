@@ -68,6 +68,30 @@ const Muinavbar = () => {
 
 
   }, []);
+//    // State to keep track of the selected category
+//    const [selectedCategory, setSelectedCategory] = useState(null);
+
+//    // State to keep track of the list of products
+//    const [products, setProducts] = useState([]);
+ 
+//    // Use useEffect to call a function when the selected category changes
+//    useEffect(() => {
+//      // Filter the list of products to only include those
+//      // that belong to the selected category
+//      const filteredProducts = products.filter(product => product.category === selectedCategory);
+ 
+//      // Update the state with the filtered list of products
+//      setProducts(filteredProducts);
+//    }, [selectedCategory, products]);
+ 
+//   const handlefilterbyCategory=(param)=>{
+//         products.filter(category);
+
+// }
+// function category(product) {
+
+//     return product.category ===param;
+//   }
 
 //   useEffect(()=>{
 //     if (typeof localStorage.getItem('token') !="undefined"){
@@ -109,9 +133,7 @@ const Muinavbar = () => {
     const handleClose = () => {
       setDropdown(null);
     };
-    const handlefilterbyCategory=()=>{
-
-    }
+    
   return (
     <Box>
                 <AppBar position='static'>
