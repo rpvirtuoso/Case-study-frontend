@@ -1,6 +1,9 @@
 import { AppBar, Button, IconButton, Stack, Toolbar, Typography } from "@mui/material";
 import StoreIcon from '@mui/icons-material/Store';
 import {Menu,MenuItem,Box,List,ListItem} from "@mui/material";
+import Badge from '@mui/material/Badge';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
 import { useNavigate } from "react-router-dom";
 import SearchAppBar from "./SearchBar";
 import { useState ,useEffect} from "react";
@@ -45,67 +48,69 @@ const Muinavbar = () => {
     const cat4='Gaming';
     const cat5='Home,Furniture and Appliances';
     const cat6='Office and Personal';
-    const cat7='Sports,Outdoor and Travel';
+    const cat7='Sports,Outdoors and Travel';
+    const all='all'
 
     const navigate = useNavigate();
-    const [dropdown, setDropdown] = useState(null);
+    const [categoriesdropdown, setCategoriesDropdown] = useState(null);
+    const [profiledropdown, setProfileDropdown] = useState(null);
+
     const [products, setProducts] = useState([]);
+    const [filteredproducts,setFilteredProducts]=useState([]);
     const classes = useStyles();
     const [IsLoggedIn,setIsLoggedIn]=useState(false);
-    const [categories,setCategories]=useState(null);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [apiResponse, setApiResponse] = useState(null);
 
+    
   useEffect(() => {
     // Fetch the data from the API
     fetch('http://127.0.0.1:8000/api/products/')
       .then(response => response.json())
       .then(data => {
+        setFilteredProducts(data);
         setProducts(data);
       });
       if (typeof localStorage.getItem('token') !="undefined"){
         setIsLoggedIn(true);
         console.log(setIsLoggedIn);
     }
-
+    console.log('First useEffect is called')
 
   }, []);
-//    // State to keep track of the selected category
-//    const [selectedCategory, setSelectedCategory] = useState(null);
+  useEffect(()=>{
 
-//    // State to keep track of the list of products
-//    const [products, setProducts] = useState([]);
- 
-//    // Use useEffect to call a function when the selected category changes
-//    useEffect(() => {
-//      // Filter the list of products to only include those
-//      // that belong to the selected category
-//      const filteredProducts = products.filter(product => product.category === selectedCategory);
- 
-//      // Update the state with the filtered list of products
-//      setProducts(filteredProducts);
-//    }, [selectedCategory, products]);
- 
-//   const handlefilterbyCategory=(param)=>{
-//         products.filter(category);
-
-// }
-// function category(product) {
-
-//     return product.category ===param;
-//   }
-
-//   useEffect(()=>{
-//     if (typeof localStorage.getItem('token') !="undefined"){
-//         setIsLoggedIn(true)
-//         console.log(setIsLoggedIn)
-//     }
-//   },[IsLoggedIn]);
+        if (selectedCategory!='all'){
+            const filteredProducts = products.filter(product => product.category === selectedCategory);
+            setFilteredProducts(filteredProducts);
+        }
+        else{
+            setFilteredProducts(products);
+        }
+       
+      }
+  ,[selectedCategory])
 
 
-    // const checkStatus=()=>{
-    //     if (typeof localStorage.getItem('token') !="undefined"){
-    //         setIsLoggedIn(true)
-    //     }
-    // }`
+  function handleResponse(response) {
+        console.log(response);
+        setApiResponse(response);
+        console.log(apiResponse);
+}
+    useEffect(()=>{
+        console.log('third useEffect called')
+        console.log(apiResponse);
+
+        if(apiResponse===null){
+            //  setFilteredProducts(apiResponse)
+
+        }
+        else if(apiResponse.status===200)
+        {
+                         setFilteredProducts(apiResponse.data)
+
+        }
+    },[apiResponse])
     const handleLogout=()=>{
 
         const id=localStorage.getItem('user_id');
@@ -120,108 +125,109 @@ const Muinavbar = () => {
         axios.post("http://127.0.0.1:8000/api/account/logout",bodyParameters,config);
         setIsLoggedIn(false);
         console.log(IsLoggedIn);
-        localStorage.removeItem("user_id");
-        localStorage.removeItem("email");
-        localStorage.removeItem("token");
+        localStorage.clear();
 
     };
+    const handleProfileClick=(event)=>{
+        console.log('Clicked Profile')
+        setProfileDropdown(event.currentTarget);
 
-    const handleClick = (event) => {
-      setDropdown(event.currentTarget);
+    };
+    const handleProfileClose = () => {
+        setProfileDropdown(null);
+    };
+    const handleCategoriesClick = (event) => {
+        setCategoriesDropdown(event.currentTarget);
     };
   
-    const handleClose = () => {
-      setDropdown(null);
+    const handleCategoriesClose = () => {
+        setCategoriesDropdown(null);
     };
     
   return (
-    <Box>
+            <Box>
                 <AppBar position='static'>
-            <Toolbar>
-                <IconButton onClick={() => {  navigate("/"); }} size='large' edge='start' color="inherit" aria-label="logo">
-                    <StoreIcon/>
-                </IconButton>
-                <Typography variant="h6" component='div' sx={{flexGrow:1}}>
-                    Shopping App
-                </Typography>
-                <SearchAppBar/>
-                <Stack direction='row' spacing={2}>
-                <Button
-                aria-controls="categories-menu"
-                aria-haspopup="true"
-                onClick={handleClick}
-                color="inherit"
-                sx={{textTransform: "none"}}
-            >
-                Categories
-            </Button>
+                    <Toolbar>
+                    <IconButton onClick={() => {  navigate("/"); }} size='large' edge='start' color="inherit" aria-label="logo">
+                        <StoreIcon/>
+                    </IconButton>
+                    <Typography variant="h6" component='div' sx={{flexGrow:1}}>
+                        Shopping App
+                    </Typography>
+                    <SearchAppBar onApiResponse={handleResponse}/>
+                        <Stack direction='row' spacing={2}>
+                        <Button
+                            aria-controls="categories-menu"
+                            aria-haspopup="true"
+                            onClick={handleCategoriesClick}
+                            color="inherit"
+                            sx={{textTransform: "none"}}
+                            >Categories</Button>
                     <Menu
                         id="categories-menu"
-                        anchorEl={dropdown}
+                        anchorEl={categoriesdropdown}
                         keepMounted
-                        open={Boolean(dropdown)}
-                        onClose={handleClose}
+                        open={Boolean(categoriesdropdown)}
+                        onClose={handleCategoriesClose}
                         >
-                        <MenuItem onClick={() => handlefilterbyCategory(cat1)}>Books and Education</MenuItem>
-                        <MenuItem onClick={() => handlefilterbyCategory(cat2)}>Electronics</MenuItem>
-                        <MenuItem onClick={() => handlefilterbyCategory(cat3)}>Fashion and Beauty</MenuItem>
-                        <MenuItem onClick={() => handlefilterbyCategory(cat4)}>Gaming</MenuItem>
-                        <MenuItem onClick={() => handlefilterbyCategory(cat5)}>Home,Furniture and Appliances</MenuItem>
-                        <MenuItem onClick={() => handlefilterbyCategory(cat6)}>Office and Personal</MenuItem>
-                        <MenuItem onClick={() => handlefilterbyCategory(cat7)}>Sports,Outdoor and Travel</MenuItem>
-
-
-
+                        <MenuItem onClick={() => setSelectedCategory(cat1)}>Books and Education</MenuItem>
+                        <MenuItem onClick={() => setSelectedCategory(cat2)}>Electronics</MenuItem>
+                        <MenuItem onClick={() => setSelectedCategory(cat3)}>Fashion and Beauty</MenuItem>
+                        <MenuItem onClick={() => setSelectedCategory(cat4)}>Gaming</MenuItem>
+                        <MenuItem onClick={() => setSelectedCategory(cat5)}>Home,Furniture and Appliances</MenuItem>
+                        <MenuItem onClick={() => setSelectedCategory(cat6)}>Office and Personal</MenuItem>
+                        <MenuItem onClick={() => setSelectedCategory(cat7)}>Sports,Outdoors and Travel</MenuItem>
+                        <MenuItem onClick={() => setSelectedCategory(all)}>All</MenuItem>
+                    </Menu>
+                        {IsLoggedIn ? (
+                                    <Button onClick={handleLogout} color="inherit" sx={{textTransform: "none"}}>Logout</Button>) 
+                                :  (<Button onClick={() => {  navigate("/login"); }} color="inherit" sx={{textTransform: "none"}}>Login</Button>
+                                        )}
+                        <Button
+                            aria-controls="profile-menu"
+                            aria-haspopup="true"
+                            onClick={handleProfileClick}
+                            color="inherit"
+                            sx={{textTransform: "none"}}
+                            >Profile</Button>
+                    <Menu
+                         id="profile-menu"
+                        anchorEl={profiledropdown}
+                        keepMounted
+                        open={Boolean(profiledropdown)}
+                        onClose={handleProfileClose}                        
+                        >
+                        <MenuItem onClick={() => {navigate('/profile')}}>Your Profile</MenuItem>
+                        <MenuItem onClick={() => {navigate('/orderhistory')}}>Order History</MenuItem>
 
                     </Menu>
-      {IsLoggedIn ? (
-        <Button onClick={handleLogout} color="inherit" sx={{textTransform: "none"}}>Logout</Button>
-      ) : (
-        <Button onClick={() => {  navigate("/login"); }} color="inherit" sx={{textTransform: "none"}}>Login</Button>
-      )}
-
-
-
-
-                    {/* <Button onClick={() => {  
-                        navigate("/login"); }} color="inherit" sx={{textTransform: "none"}}>Login</Button> */}
-                </Stack>
-            </Toolbar>
-        </AppBar>
-        {/* <List>
-            {products.map((product) => (
-            <ListItem key={product.id}>
-                {product.name}
-                {product.price}
-                {product.category}
-                {product.subcategory}
-                {product.description}
-
-            </ListItem>
-            ))}
-        </List> */}
-        {/* <ProductList/> */}
-        <div className={classes.root}>
-      { <Grid container spacing={2}>
-        {products.map((product) => (
-          <Grid item xs={12} sm={6} md={4} key={product.id} className={classes.gridItem}>
-            <div className={classes.productCard}>
-              <img src={'http://127.0.0.1:8000'+product.image} alt={product.name} className={classes.productImage} />
-              <Link to={`/products/${product.id}`}>
-                <Typography variant="body1" className={classes.productName}>
-                {product.name}
-                </Typography>
-              </Link>
-              
-              <Typography variant="body2" className={classes.productPrice}>
-                {'₹'+product.price}
-              </Typography>
-            </div>
-          </Grid>
-        ))}
-      </Grid> 
-      
-      }
+                    <IconButton onClick={() => {  navigate("/cart"); }}size="large" aria-label="show cart items" color="inherit">
+                        <Badge badgeContent={0} color="error">
+                            <ShoppingCartIcon />
+                        </Badge>
+                    </IconButton>
+                        </Stack>
+                    </Toolbar>
+                </AppBar>
+                <div className={classes.root}>
+                { <Grid container spacing={2}>
+                {filteredproducts.map((product) => (
+                    <Grid item xs={12} sm={6} md={4} key={product.id} className={classes.gridItem}>
+                        <div className={classes.productCard}>
+                             <img src={'http://127.0.0.1:8000'+product.image} alt={product.name} className={classes.productImage} />
+                            <Link to={`/products/${product.id}`}>
+                            <Typography variant="body1" className={classes.productName}>
+                            {product.name}
+                            </Typography>
+                            </Link>
+                            <Typography variant="body2" className={classes.productPrice}>
+                            {'₹'+product.price}
+                            </Typography>
+                        </div>
+                    </Grid>
+                    ))}
+                </Grid> 
+                }
     </div>
     </Box>
     

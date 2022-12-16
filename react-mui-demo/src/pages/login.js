@@ -13,7 +13,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { IconButton, InputAdornment } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import axios, * as others from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -22,10 +22,10 @@ const theme = createTheme();
 
 export default function SignIn() {
   const navigate=useNavigate()
-  const [state, setState] = useState({email:null,token:null,user_id:null});
-  const email=state.email
-  const token=state.token
-  const user_id=state.user_id
+ 
+  const res_email=null;
+  const res_token=null;
+  const res_user_id=null;
   // const [isAuthenticated,]
   const handleSubmit = async(event) => {
     event.preventDefault();
@@ -61,19 +61,14 @@ export default function SignIn() {
   // localStorage.setItem('email')
   console.log(response);
   console.log(response.data);
-  setState(prevState=>{
-    return{      
-      email:response.data.email,
-      token:response.data.token,
-      user_id:response.data.user_id
-    }
-    }
-  )
-  console.log(state)
+  // res_email=response.data.email;
+  // res_token=response.data.token;
+  // res_user_id=response.data.user_id;
+  // console.log(res_user_id)
   
-  localStorage.setItem("email",email);
-  localStorage.setItem("token",token);
-  localStorage.setItem("user_id",user_id);
+  localStorage.setItem("email",response.data.email);
+  localStorage.setItem("token",response.data.token);
+  localStorage.setItem("user_id",response.data.user_id);
   navigate('/');
 
   };
@@ -156,7 +151,7 @@ export default function SignIn() {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="http://localhost:3000/signup" variant="body2">
+                <Link href="http://localhost:3000/signup1" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

@@ -1,7 +1,8 @@
 import { styled, alpha } from '@mui/material/styles';
-
+import { useState } from 'react';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
+import axios from "axios";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -45,7 +46,18 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function SearchAppBar() {
+export default function SearchAppBar( {onApiResponse }) {
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter') {
+      const { value } = event.target;
+    // Call the API here
+    axios.get(`http://127.0.0.1:8000/api/products/search/${value}`)
+      .then((response) => {
+        // Do something with the response data
+        onApiResponse(response);
+      });
+  }}
   return (
    
           <Search>
@@ -55,6 +67,8 @@ export default function SearchAppBar() {
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
+              onKeyDown={handleKeyDown}
+
             />
           </Search>
   );
