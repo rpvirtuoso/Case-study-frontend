@@ -1,14 +1,11 @@
 import { AppBar, Button, IconButton, Stack, Toolbar, Typography } from "@mui/material";
 import StoreIcon from '@mui/icons-material/Store';
-import {Menu,MenuItem,Box,List,ListItem} from "@mui/material";
+import {Menu,MenuItem,Box} from "@mui/material";
 import Badge from '@mui/material/Badge';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-
 import { useNavigate } from "react-router-dom";
 import SearchAppBar from "./SearchBar";
 import { useState ,useEffect} from "react";
-import ProductList from "./ProductList";
-import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { Link } from "react-router-dom";
@@ -133,6 +130,7 @@ const Muinavbar = () => {
         setProfileDropdown(event.currentTarget);
 
     };
+   
     const handleProfileClose = () => {
         setProfileDropdown(null);
     };
@@ -154,7 +152,7 @@ const Muinavbar = () => {
                     <Typography variant="h6" component='div' sx={{flexGrow:1}}>
                         Shopping App
                     </Typography>
-                    <SearchAppBar onApiResponse={handleResponse}/>
+                    <SearchAppBar products={products} filteredproducts={filteredproducts} setFilteredProducts={setFilteredProducts} onApiResponse={handleResponse}/>
                         <Stack direction='row' spacing={2}>
                         <Button
                             aria-controls="categories-menu"
@@ -214,12 +212,10 @@ const Muinavbar = () => {
                 {filteredproducts.map((product) => (
                     <Grid item xs={12} sm={6} md={4} key={product.id} className={classes.gridItem}>
                         <div className={classes.productCard}>
-                             <img src={'http://127.0.0.1:8000'+product.image} alt={product.name} className={classes.productImage} />
-                            <Link to={`/products/${product.id}`}>
+                             <img onClick={()=>navigate(`/products/${product.id}`)} src={'http://127.0.0.1:8000'+product.image} alt={product.name} className={classes.productImage} />
                             <Typography variant="body1" className={classes.productName}>
                             {product.name}
                             </Typography>
-                            </Link>
                             <Typography variant="body2" className={classes.productPrice}>
                             {'₹'+product.price}
                             </Typography>

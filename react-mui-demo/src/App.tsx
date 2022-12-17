@@ -12,9 +12,10 @@ import Cart from './pages/Cart';
 import ProfilePage from './pages/ProfilePage';
 import ProfilePage2 from './pages/ProfilePage2';
 import UpdateProfile from './pages/UpdateProfile';
+import Box from '@mui/material/Box/Box';
 function App() {
   return (
-    <div >
+    <Box>
       {/* <MuiTypography/> */}
       <Routes>
           <Route path="/" element={<Muinavbar/>}/>
@@ -33,7 +34,7 @@ function App() {
           <Route path='/cart' element={<Cart/>}/>
 
       </Routes>
-    </div>
+    </Box>
   );
 }
 

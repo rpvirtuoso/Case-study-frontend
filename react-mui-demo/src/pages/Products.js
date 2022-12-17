@@ -55,7 +55,7 @@ const handleIncrement = () => {
 };
 
 const handleDecrement = () => {
-  if (quantity >=1) {
+  if (quantity >1) {
     setQuantity(quantity - 1);
   }
 };
