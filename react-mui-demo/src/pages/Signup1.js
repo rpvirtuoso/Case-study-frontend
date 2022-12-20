@@ -59,11 +59,11 @@ function Signup1() {
         const id=resJson.id
         console.log(token)
 
-        localStorage.setItem(email, token)
-        localStorage.setItem('ID',id)
-        console.log("Just  before redirect")
-        const token2=localStorage.getItem(email)
-        console.log(token2)
+        // localStorage.setItem(email, token)
+        // localStorage.setItem('ID',id)
+        // console.log("Just  before redirect")
+        // const token2=localStorage.getItem(email)
+        // console.log(token2)
         navigate("/login");
         
         

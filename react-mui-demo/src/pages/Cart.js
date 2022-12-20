@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { useState ,useEffect} from "react";
 import {Menu,MenuItem} from "@mui/material";
 import axios from 'axios';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 
 const useStyles = makeStyles({
@@ -31,8 +32,11 @@ const Cart = () => {
     const user_id=localStorage.getItem("user_id")
     const [items, setItems] = useState([]);
     const [modifieditems, setModifiedItems] = useState([]);
-
+    const [cartquantity,setCartQuantity]=useState(0);
     const token=localStorage.getItem('token');
+    const isSmallScreen = useMediaQuery('(max-width: 600px)');
+    const [totalPrice, setTotalPrice] = useState(0);
+
     const config = {  headers: {
                               'Content-Type': 'application/json',
                               'Authorization': `Token ${token}`
@@ -44,6 +48,8 @@ const Cart = () => {
     useEffect(()=>{
                     axios.get(`http://127.0.0.1:8000/api/cart/${user_id}/getCart`,config).then(response => {
                     console.log(response.data.products);
+                    setCartQuantity(response.data.products.length)
+                    // setCartQuantity(response.data.products.length);
                     setItems(response.data.products);}).catch(error => {console.log(error);});
                     console.log(items);
                 },[])
@@ -51,6 +57,9 @@ const Cart = () => {
     useEffect(()=>{
                     axios.get(`http://127.0.0.1:8000/api/cart/${user_id}/getCart`,config).then(response => {
                     console.log(response.data.products);
+                    setCartQuantity(response.data.products.length);
+                    const total = response.data.products.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+                    setTotalPrice(total);
                     setItems(response.data.products);}).catch(error => {console.log(error);});
                     console.log(items);
                 },[modifieditems])
@@ -89,17 +98,23 @@ const Cart = () => {
     };
     const handleCreateOrder = () => {
       // create order logic goes here...
-      const config = {  headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${token}`
+      console.log(cartquantity);
+    if(cartquantity>0)
+        {    
+            const config = {  headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`
+                }
+                };
+              axios.get(`http://127.0.0.1:8000/api/order/${user_id}/createOrder`,config).then(response => {
+                console.log(response);
+              })
+              navigate('/')
+        
+            };  
         }
-        };
-      axios.get(`http://127.0.0.1:8000/api/order/${user_id}/createOrder`,config).then(response => {
-        console.log(response);
-      })
-      navigate('/')
-
-    };
+  
+     
     const handleremoveCartitem =  async (id) => {
         // remove cart item logic goes here...
         
@@ -133,6 +148,7 @@ const Cart = () => {
     };
   
     return (
+        <>
         <Box>
          <AppBar position='static'>
                     <Toolbar>
@@ -162,7 +178,23 @@ const Cart = () => {
                     </Menu>
                     </Toolbar>
                 </AppBar>
-      <TableContainer component={Paper}>
+                </Box>
+            {isSmallScreen ? (
+        // code for small screen sizes
+                            <>
+                            {items.map((item) => (
+                            <Box key={item.id} display="flex" flexDirection="row" alignItems="center">
+                            <Box flexGrow={1}>
+                                {item.product.name} - {item.quantity} x ${item.product.price}
+                            </Box>
+                            <Input value={item.quantity} onChange={(event) => handleQuantityChange(item.id, event.target.value)} />
+                            <IconButton color="secondary" onClick={() => { handleremoveCartitem(item.id) }}>
+                            <DeleteIcon />
+                            </IconButton>
+                            </Box>
+                        ))}
+        </>
+      ) :( <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="cart table">
           <TableHead>
             <TableRow>
@@ -202,15 +234,18 @@ const Cart = () => {
             ))}
           </TableBody>
           <TableRow>
-              <TableCell>Total:</TableCell>
-            </TableRow>
+                <TableCell colSpan={3} align="right">Total</TableCell>
+                 <TableCell align="right">${totalPrice.toFixed(2)}</TableCell>
+        </TableRow>
         </Table>
         <Button sx={{textTransform: "none"}} style={{float: "right",backgroundColor: "Tomato"}} onClick={handleCreateOrder}>
         <Typography variant="button" display="block" gutterBottom>
             Create Order
         </Typography></Button>
-      </TableContainer>
-      </Box>
+      </TableContainer>)
+        }
+        </>
+       
     );
 }
 

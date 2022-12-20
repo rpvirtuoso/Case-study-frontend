@@ -35,17 +35,35 @@ const useStyles = makeStyles(theme => ({
 const Products = () => {
   const navigate=useNavigate();
   const {productId}= useParams();
+  const [isAdmin,setIsAdmin]=useState(false);
+
   const [product,setProduct]=useState([]);
   const classes = useStyles();
   const [quantity, setQuantity] = React.useState(0);
   const userId= localStorage.getItem('user_id');
   useEffect(() => {
     // Fetch the data from the API
+    const token=localStorage.getItem('token');
+
+    const config = {
+      headers: { Authorization: `Token ${token}` }
+  };
     axios.get(`http://127.0.0.1:8000/api/products/getById/${productId}`).then(function (response) {
       setProduct(response.data);
     });
+    axios.get(`http://127.0.0.1:8000/api/account/checkAdmin`,config).then(response=>{
+        console.log(response);
+        if (response.status===200)
+        {
+            setIsAdmin(true);
+        }
+        // if
+    })
 },[])
-
+const handleModifyProduct=()=>{
+  console.log(product.id);
+  navigate('/modifyproduct',{ state: { id: product.id } })
+}
 const handleChange = (event) => {
   setQuantity(parseInt(event.target.value));
 };
@@ -106,7 +124,7 @@ axios.post(`http://127.0.0.1:8000/api/cart/${userId}/changeQuantity/${productId}
             <Typography variant='body1'>
                 {product.description}
             </Typography>
-            <TextField className={classes.input}
+            {/* <TextField className={classes.input}
                         type="number"
                         value={quantity}
                         onChange={handleChange}
@@ -121,10 +139,28 @@ axios.post(`http://127.0.0.1:8000/api/cart/${userId}/changeQuantity/${productId}
                                                       </InputAdornment>
                                                     ),
       }}
-    />
-        <Button variant="contained" color="primary" onClick={handleAddToCart}>
-        Add to Cart
-      </Button>
+    />  */}
+    {isAdmin ? (<Button onClick={handleModifyProduct} color="red" sx={{textTransform: "none"}}>Modify</Button>) 
+              :  (<>
+
+              <TextField className={classes.input}
+                        type="number"
+                        value={quantity}
+                        onChange={handleChange}
+                        InputProps={{endAdornment: (
+                                                      <InputAdornment position="end">
+                                                        <IconButton onClick={handleIncrement}>
+                                                          <AddIcon />
+                                                        </IconButton>
+                                                        <IconButton onClick={handleDecrement}>
+                                                          <RemoveIcon />
+                                                        </IconButton>
+                                                      </InputAdornment>
+                                                    ),
+      }}
+    /> 
+                <Button variant="contained" color="primary" onClick={handleAddToCart}>Add to Cart</Button>
+                </>)}
         </Stack>
       </Grid>
     </Grid>

@@ -13,6 +13,9 @@ import ProfilePage from './pages/ProfilePage';
 import ProfilePage2 from './pages/ProfilePage2';
 import UpdateProfile from './pages/UpdateProfile';
 import Box from '@mui/material/Box/Box';
+import Admin from './pages/Admin';
+import ModifyProduct from './pages/ModifyProduct';
+import Addproduct from './pages/Addproduct';
 function App() {
   return (
     <Box>
@@ -32,6 +35,11 @@ function App() {
 
           <Route path='/orderhistory' element ={<OrderHistory/>}/>
           <Route path='/cart' element={<Cart/>}/>
+          <Route path="/admin" element={<Admin/>}/>
+          <Route path="/modifyproduct" element={<ModifyProduct/>}/>
+          <Route path="/addproduct" element={<Addproduct/>}/>
+
+
 
       </Routes>
     </Box>
