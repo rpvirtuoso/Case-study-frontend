@@ -64,9 +64,14 @@ const ModifyProduct = () => {
           setCategory(product.category);
           setSubCategory(product.subcategory);
           setDescription(product.description);
+          console.log(`Description ${description}`);
+
+          
     }, [])
 
     useEffect(() => {
+      console.log(description);
+
         async function fetchCategories() {
             const token=localStorage.getItem('token');
             const config = {
@@ -94,6 +99,7 @@ const ModifyProduct = () => {
           console.log(response);
           const data = await response.data;
           setSubCategories(data);
+          console.log(description);
 
         }
         fetchSubCategories();

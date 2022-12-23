@@ -34,7 +34,13 @@ const ProfilePage2 = () => {
   const handleProfileClose = () => {
     setProfileDropdown(null);
     };
-    useEffect(() => {
+  useEffect(() => {
+    const token=localStorage.getItem('token');
+              console.log(token)
+              if(token===null)
+              {
+                navigate('/login')
+              }
         axios.get(`http://127.0.0.1:8000/api/account/getprofile/${user_id}`,config).then(response=>{
             console.log(response.data);
             setProfile(response.data);
@@ -87,7 +93,7 @@ const ProfilePage2 = () => {
 
       <Form.Group as={Col} controlId="formGridPassword">
         <Form.Label>Password</Form.Label>
-        <Form.Control readOnly type="password" placeholder={profile.password} />
+        <Form.Control readOnly type="password"  />
       </Form.Group>
     </Row>
 

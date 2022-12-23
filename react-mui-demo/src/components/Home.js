@@ -8,9 +8,12 @@ import SearchAppBar from "./SearchBar";
 import { useState ,useEffect} from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import { Link } from "react-router-dom";
 import axios from "axios";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Slider from '@mui/material/Slider';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -64,6 +67,16 @@ const Muinavbar = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [apiResponse, setApiResponse] = useState(null);
     const [menuButtonAnchor, setMenuButtonAnchor] = useState(null);
+    const [cartquantity, setCartQuantity] = useState(0);
+    const [price, setPrice] = useState(0);
+    // const [pricedproducts,setPricedProducts]=useState();
+
+    const handlePriceChange = (event, newValue) => {
+        setPrice(newValue);
+        const pricedproducts = products.filter(product => product.price > price);
+            setFilteredProducts(pricedproducts);
+    };
+
 
     const handleMenuButtonClick = (event) => {
         setMenuButtonAnchor(event.currentTarget);
@@ -80,11 +93,25 @@ const Muinavbar = () => {
         setFilteredProducts(data);
         setProducts(data);
       });
-      if (typeof localStorage.getItem('token') !="undefined"){
-        setIsLoggedIn(true);
-        console.log(setIsLoggedIn);
-    }
-    console.log('First useEffect is called')
+      const token=localStorage.getItem('token');
+
+      if(token!=null)
+      {
+       setIsLoggedIn(true);
+       const config = {  headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Token ${token}`
+        }
+};
+       const user_id=localStorage.getItem("user_id");
+       axios.get(`http://127.0.0.1:8000/api/cart/${user_id}/getCart`,config).then(response => 
+       {
+        console.log(response.data.products);
+        setCartQuantity(response.data.products.length);})
+
+      }
+    console.log(`isLoggedin:${IsLoggedIn}`);
+    
 
   }, []);
   useEffect(() => {
@@ -121,39 +148,7 @@ const Muinavbar = () => {
         setApiResponse(response);
         console.log(apiResponse);
 }
-    useEffect(()=>{
-        console.log('third useEffect called')
-        console.log(apiResponse);
-
-        if(apiResponse===null){
-            //  setFilteredProducts(apiResponse)
-
-        }
-        else if(apiResponse.status===200)
-        {
-                         setFilteredProducts(apiResponse.data)
-
-        }
-    },[apiResponse])
-
-    // useEffect(() => {
-    //     const handleResize = () => {
-    //       if (window.innerWidth < 600) {
-    //         setDropdownVisible(true);
-    //       } else {
-    //         setDropdownVisible(false);
-    //       }
-    //     };
-    //     window.addEventListener('resize', handleResize);
-    //     return () => {
-    //       window.removeEventListener('resize', handleResize);
-    //     };
-    //   }, []);
-    
-    // const toggleDropdown = () => {
-    //     setDropdownVisible(!dropdownVisible);
-    //   };
-
+  
     const handleLogout=()=>{
 
         const id=localStorage.getItem('user_id');
@@ -268,7 +263,7 @@ const Muinavbar = () => {
                                         )}
                     </Menu>
                     <IconButton onClick={() => {  navigate("/cart"); }}size="large" aria-label="show cart items" color="inherit">
-                        <Badge badgeContent={0} color="error">
+                        <Badge badgeContent={cartquantity} color="error">
                             <ShoppingCartIcon />
                         </Badge>
                     </IconButton>
@@ -319,7 +314,7 @@ const Muinavbar = () => {
                     </Menu>
                             <MenuItem onClick={handleMenuButtonClose}>
                                 <IconButton onClick={() => {  navigate("/cart"); }}size="large" aria-label="show cart items" color="inherit">
-                                    <Badge badgeContent={0} color="secondary">
+                                    <Badge badgeContent={cartquantity} color="secondary">
                                         <ShoppingCartIcon />
                                     </Badge>
                                 </IconButton>
@@ -382,6 +377,20 @@ const Muinavbar = () => {
                         </Stack>
                     </Toolbar>
                 </AppBar>
+                <Box sx={{ width: "100%", paddingTop: "1%",
+                        "@media (min-width: 600px)": { width: "50%", paddingTop: "2%" },
+                        "@media (min-width: 960px)": { width: "25%", paddingTop: "3%" }
+                        }}>
+                        <Stack spacing={2} direction="row" sx={{ mb: "1%",
+                            "@media (min-width: 600px)": { mb: "2%" },
+                            "@media (min-width: 960px)": { mb: "3%" }
+                            }} alignItems="center">
+                        <Button variant="contained" color="primary" >Price</Button>
+                        <RemoveIcon />
+                        <Slider valueLabelDisplay='auto' min={0} max={150000} aria-label="Volume" value={price} onChange={handlePriceChange} />
+                        <AddIcon />
+                    </Stack>
+                 </Box>
                 <div className={classes.root}>
                 { <Grid container spacing={2}>
                 {filteredproducts.map((product) => (

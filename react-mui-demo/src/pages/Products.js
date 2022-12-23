@@ -36,6 +36,7 @@ const Products = () => {
   const navigate=useNavigate();
   const {productId}= useParams();
   const [isAdmin,setIsAdmin]=useState(false);
+  const [cartquantity, setCartQuantity] = useState(0);
 
   const [product,setProduct]=useState([]);
   const classes = useStyles();
@@ -59,7 +60,21 @@ const Products = () => {
         }
         // if
     })
-},[])
+    if(token!=null)
+    {
+     const config = {  headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Token ${token}`
+      }
+};
+     const user_id=localStorage.getItem("user_id");
+     axios.get(`http://127.0.0.1:8000/api/cart/${user_id}/getCart`,config).then(response => 
+     {
+      console.log(response.data.products);
+      setCartQuantity(response.data.products.length);})
+
+    }
+},[cartquantity])
 const handleModifyProduct=()=>{
   console.log(product.id);
   navigate('/modifyproduct',{ state: { id: product.id } })
@@ -73,27 +88,53 @@ const handleIncrement = () => {
 };
 
 const handleDecrement = () => {
-  if (quantity >1) {
+  if (quantity >=1) {
     setQuantity(quantity - 1);
   }
 };
 
 const handleAddToCart=()=> {
-  console.log(`product id : ${productId}`)
-  const bodyParameters = {
-    quantity: quantity,
- };
- const token=localStorage.getItem('token')
- const config = {
-         headers: { Authorization: `Token ${token}` }
-     };
+  const token=localStorage.getItem('token');
+
+  if(token===null)
+  {
+    navigate('/login')
+  }
+
+  if (quantity>=1)
+  {
+    console.log(`product id : ${productId}`);
+    const bodyParameters = {
+      quantity: quantity,
+   };
+   const config = {
+    headers: { Authorization: `Token ${token}` }
+};
 axios.post(`http://127.0.0.1:8000/api/cart/${userId}/changeQuantity/${productId}`,bodyParameters,config).then(response => {
-      // handle success
-      console.log(response);
-    }).catch(error => {
-      // handle error
-      console.log(error);
-    });
+  // handle success
+  console.log(response);
+}).catch(error => {
+  // handle error
+  console.log(error);
+});
+  }
+ 
+ 
+
+
+//     {
+//       const config = {  headers: {
+//        'Content-Type': 'application/json',
+//        'Authorization': `Token ${token}`
+//        }
+//  };
+//       const user_id=localStorage.getItem("user_id");
+//       axios.get(`http://127.0.0.1:8000/api/cart/${user_id}/getCart`,config).then(response => 
+//       {
+//        console.log(response.data.products);
+//        setCartQuantity(response.data.products.length);})
+ 
+//      }
 }
 
   return (
@@ -107,7 +148,7 @@ axios.post(`http://127.0.0.1:8000/api/cart/${userId}/changeQuantity/${productId}
             Shopping App
         </Typography>
         <IconButton onClick={() => {  navigate("/cart"); }}size="large" aria-label="show cart items" color="inherit">
-          <Badge badgeContent={0} color="error">
+          <Badge badgeContent={cartquantity} color="error">
               <ShoppingCartIcon />
           </Badge>
         </IconButton>
@@ -116,7 +157,7 @@ axios.post(`http://127.0.0.1:8000/api/cart/${userId}/changeQuantity/${productId}
     <div className={classes.root}>
     <Grid container style={{height: '50%'}}>
       <Grid item xs={6} className={classes.column}>
-        <img alt={product.name} className={classes.image} src={'http://127.0.0.1:8000'+product.image}></img>
+        <img alt={product.name}   style={{ objectFit: "scale-down" } } className={classes.image} src={'http://127.0.0.1:8000'+product.image}></img>
       </Grid>
       <Grid item xs={6} className={classes.column}>
         <Stack direction="column">
@@ -140,7 +181,7 @@ axios.post(`http://127.0.0.1:8000/api/cart/${userId}/changeQuantity/${productId}
                                                     ),
       }}
     />  */}
-    {isAdmin ? (<Button onClick={handleModifyProduct} color="red" sx={{textTransform: "none"}}>Modify</Button>) 
+    {isAdmin ? (<Button variant="contained" color="primary" onClick={handleModifyProduct} >Modify</Button>) 
               :  (<>
 
               <TextField className={classes.input}

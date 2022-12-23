@@ -43,6 +43,7 @@ const Addproduct = () => {
           };
           const response = await axios.post('http://127.0.0.1:8000/api/products/addProduct',  body,config)
           console.log(response);
+        
     }
     useEffect(() => {
         async function fetchCategories() {
@@ -52,6 +53,11 @@ const Addproduct = () => {
             };
           const response = await axios.get('http://127.0.0.1:8000/api/products/getCategories',config);
           console.log(response);
+          if (response.status===401){
+            navigate('/login');
+            console.log(response.status);
+
+          }
           const data = await response.data;
           console.log(data);
           setCategories(data);
@@ -62,6 +68,11 @@ const Addproduct = () => {
       useEffect(() => {
         async function fetchSubCategories() {
             const token=localStorage.getItem('token');
+              console.log(token)
+              if(token===null)
+              {
+                navigate('/login')
+              }
                 const config = {  headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Token ${token}`
@@ -70,6 +81,11 @@ const Addproduct = () => {
             
           const response = await axios.post('http://127.0.0.1:8000/api/products/getSubCategories',{ category },config);
           console.log(response);
+          if (response.status===401){
+            navigate('/login');
+            console.log(response.status);
+
+          }
           const data = await response.data;
           setSubCategories(data);
 

@@ -36,7 +36,7 @@ const Cart = () => {
     const token=localStorage.getItem('token');
     const isSmallScreen = useMediaQuery('(max-width: 600px)');
     const [totalPrice, setTotalPrice] = useState(0);
-
+    const [updated_items,setUpdated_items]=useState([]);
     const config = {  headers: {
                               'Content-Type': 'application/json',
                               'Authorization': `Token ${token}`
@@ -46,6 +46,12 @@ const Cart = () => {
                     // data to be sent as the request body
                 };
     useEffect(()=>{
+                    const token=localStorage.getItem('token');
+                    console.log(token)
+                    if(token===null)
+                      {
+                        navigate('/login')
+                      }
                     axios.get(`http://127.0.0.1:8000/api/cart/${user_id}/getCart`,config).then(response => {
                     console.log(response.data.products);
                     setCartQuantity(response.data.products.length)
@@ -62,7 +68,7 @@ const Cart = () => {
                     setTotalPrice(total);
                     setItems(response.data.products);}).catch(error => {console.log(error);});
                     console.log(items);
-                },[modifieditems])
+                },[modifieditems,updated_items])
     const handleQuantityChange = (id, newQuantity) => {
         console.log(id)
         const updatedItems = items.map((item) => {
@@ -86,6 +92,7 @@ const Cart = () => {
         }
         return item;
       });
+      setUpdated_items(updatedItems);
       setItems(updatedItems);
     };
     const handleProfileClick=(event)=>{
@@ -235,7 +242,7 @@ const Cart = () => {
           </TableBody>
           <TableRow>
                 <TableCell colSpan={3} align="right">Total</TableCell>
-                 <TableCell align="right">${totalPrice.toFixed(2)}</TableCell>
+                 <TableCell align="right">${totalPrice}</TableCell>
         </TableRow>
         </Table>
         <Button sx={{textTransform: "none"}} style={{float: "right",backgroundColor: "Tomato"}} onClick={handleCreateOrder}>
